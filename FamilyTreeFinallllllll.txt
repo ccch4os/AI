@@ -1,0 +1,199 @@
+% Facts: Define relationships in the family tree
+male(varad).
+male(pushkar).
+male(prashant).
+male(aryan).
+male(tejas).
+male(omkar).
+male(somesh).
+male(ram).
+male(shyam).
+male(aditya).
+male(ashish).
+male(om).
+male(monish).
+male(amit).
+male(shreyas).
+male(kaustubh).
+
+female(sarika).
+female(shruti).
+female(jui).
+female(gauri).
+female(shreya).
+female(swati).
+female(kajal).
+female(aditi).
+female(tanu).
+female(riya).
+female(shraddha).
+
+parent(varad, pushkar).
+parent(varad, prashant).
+parent(sarika, pushkar).
+parent(sarika, prashant).
+parent(pushkar, omkar).
+parent(pushkar, somesh).
+parent(pushkar, ram).
+parent(pushkar, shyam).
+parent(shruti,omkar).
+parent(shruti,somesh).
+parent(shruti,ram).
+parent(shruti,shyam).
+parent(somesh,om).
+parent(somesh,tanu).
+parent(gauri,om).
+parent(gauri,tanu).
+parent(shyam,monish).
+parent(shyam,riya).
+parent(swati,monish).
+parent(swati,riya).
+parent(ram,amit).
+parent(shreya,amit).
+parent(omkar,aditya).
+parent(shyam,ashish).
+parent(jui,aditya).
+parent(swati,ashish).
+parent(prashant,aryan).
+parent(kajal,aryan).
+parent(aryan,tejas).
+parent(aditi,tejas).
+parent(prashant, shreyas).
+parent(kajal, shreyas).
+parent(shreyas, kaustubh).
+parent(shraddha, kaustubh).
+
+father(X, Y) :- male(X), parent(X, Y).
+
+mother(X, Y) :- female(X), parent(X, Y).
+
+wife(X, Y) :- parent(X, Z), parent(Y, Z), female(X), X \= Y.
+
+husband(X, Y) :- wife(Y, X).
+
+father_in_law(X, Y) :- male(X), female(Y), parent(Y, T), grandfather(X, T).
+
+mother_in_law(X, Y) :- female(X), female(Y), parent(Y, T), grandmother(X, T).
+
+son(X, Y) :- male(X), parent(Y, X).
+
+brother_in_law(X,Y) :- male(W),male(X),sibling(X,W),father(W,T),mother(Y,T).
+
+sister_in_law(X,Y) :- mother(X,W),cousin(W,T),mother(Y,T).
+
+daughter(X, Y) :- female(X), parent(Y, X).
+
+grandfather(X, Z) :- father(X, Y), parent(Y, Z).
+
+grandmother(X, Z) :- mother(X, Y), parent(Y, Z).
+
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
+
+cousin(X, Y) :- parent(Z, X), parent(W, Y), sibling(Z, W).
+
+uncle(X, Y) :- parent(Z, Y), sibling(X, Z), male(X).
+
+aunt(X, Y) :- cousin(Z, Y), mother(X, Z), female(X).
+
+second_uncle(X, Y) :- male(X), grandfather(W, Y), sibling(W, Z), son(X, Z).
+
+second_aunt(X, Y) :- female(X), grandfather(W, Y), sibling(W, Z), grandfather(Z, D), mother(X, D).
+
+second_cousin(X, Y) :- grandfather(W, Y), sibling(W, Z), grandfather(Z, X).
+
+second_grandfather(X, Y) :- grandfather(W, Y), sibling(W, X).
+
+second_grandmother(X, Y) :- second_uncle(W, Y), mother(X, W).
+
+great_grandfather(X, Z) :- father(X, Y), grandfather(Y, Z).
+
+great_grandmother(X, Z) :- mother(X, Y), grandfather(Y, Z).
+
+second_mother_in_law(Y, X) :- female(X), female(Y), wife(X,Z), father(A,Z), sibling(B,A), wife(Y,B).
+
+second_father_in_law(Y, X) :- female(X), female(Y), husband(X,Z), mother(A,Z), sibling(B,A), husband(Y,B).
+
+second_brother_in_law(Y, X) :- male(X), male(Y), husband(X, Z), sibling(A, Z), wife(Y, A).
+
+second_sister_in_law(Y, X) :- female(X), female(Y), wife(X, Z), sibling(A, Z), husband(Y, A).
+
+find_relationship(X, Y) :-
+    father(X, Y), write(X), write(' is the father of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    wife(X, Y), write(X), write(' is the wife of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    mother(X, Y), write(X), write(' is the mother of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    son(X, Y), write(X), write(' is the son of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    daughter(X, Y), write(X), write(' is the daughter of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    grandfather(X, Y), write(X), write(' is the grandfather of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    sibling(X, Y), write(X), write(' is the sibling of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    father(Z, Y), mother(X, Z), write(X), write(' is the grandmother of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_grandmother(X,Y), write(X), write(' is the second grandmother of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_grandfather(X,Y), write(X), write(' is the second grandfather of '), write(Y), nl. 
+
+find_relationship(X, Y) :-
+    second_uncle(X, Y), write(X), write(' is the second-uncle of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_aunt(X, Y), write(X), write(' is the second-aunt of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    uncle(X, Y), write(X), write(' is the uncle of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    aunt(X, Y), write(X), write(' is the aunt of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    cousin(X, Y), write(X), write(' is the cousin of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    sister_in_law(X, Y), write(X), write(' is the sister-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    brother_in_law(X, Y), write(X), write(' is the brother-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_cousin(X, Y), write(X), write(' is the second cousin of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    father_in_law(X, Y), write(X), write(' is the father-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    mother_in_law(X, Y), write(X), write(' is the mother-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    great_grandfather(X, Y), write(X), write(' is the great-grandfather of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    great_grandmother(X, Y), write(X), write(' is the great-grandmother of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_mother_in_law(X, Y), write(X), write(' is the second mother-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_father_in_law(X, Y), write(X), write(' is the second father-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_brother_in_law(X, Y), write(X), write(' is the second brother-in-law of '), write(Y), nl.
+
+find_relationship(X, Y) :-
+    second_sister_in_law(X, Y), write(X), write(' is the second sister-in-law of '), write(Y), nl.
+
+
+find_relationship(X, Y) :- write('Relationship not defined between '), write(X), write(' and '), write(Y), nl.

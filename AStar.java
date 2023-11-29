@@ -29,91 +29,102 @@ class Node implements Comparable<Node> {
 
 public class AStar {
   public static List<int[]> astar(int[][] maze, int[] start, int[] end) {
+    // Step 1: Initialize the start and end nodes with their positions
     Node startNode = new Node(null, start);
     startNode.g = startNode.h = startNode.f = 0;
     Node endNode = new Node(null, end);
     endNode.g = endNode.h = endNode.f = 0;
 
+    // Step 2: Create lists to keep track of open and closed nodes
     List<Node> openList = new ArrayList<>();
     List<Node> closedList = new ArrayList<>();
 
+    // Step 3: Add the start node to the open list
     openList.add(startNode);
 
+    // Step 4: Main A* loop - Continue until the open list is not empty
     while (!openList.isEmpty()) {
-      Node currentNode = openList.get(0);
-      int currentIndex = 0;
-      for (int i = 0; i < openList.size(); i++) {
-        if (openList.get(i).f < currentNode.f) {
-          currentNode = openList.get(i);
-          currentIndex = i;
-        }
-      }
-
-      openList.remove(currentIndex);
-      closedList.add(currentNode);
-
-      if (currentNode.equals(endNode)) {
-        List<int[]> path = new ArrayList<>();
-        Node current = currentNode;
-        while (current != null) {
-          path.add(current.position);
-          current = current.parent;
-        }
-        Collections.reverse(path);
-        return path;
-      }
-
-      List<Node> children = new ArrayList<>();
-      int[][] directions = {{0, -1}, 	//up
-      {0, 1}, 	//down
-      {-1, 0}, 	//left	
-      {1, 0}, 	//right
-      {-1, -1}, 	//d up-Left
-      {-1, 1}, 	//d up-right
-      {1, -1}, 	//d down-left
-      {1, 1}};	//d down-right
-
-      for (int[] newPosition : directions) {
-        int[] nodePosition = {currentNode.position[0] + newPosition[0], currentNode.position[1] + newPosition[1]};
-
-        if (nodePosition[0] > maze.length - 1 || nodePosition[0] < 0 || nodePosition[1] > maze[0].length - 1 || nodePosition[1] < 0) {
-          continue;
+        // Step 5: Select the node with the lowest f value from the open list
+        Node currentNode = openList.get(0);
+        int currentIndex = 0;
+        for (int i = 0; i < openList.size(); i++) {
+            if (openList.get(i).f < currentNode.f) {
+                currentNode = openList.get(i);
+                currentIndex = i;
+            }
         }
 
-        if (maze[nodePosition[0]][nodePosition[1]] != 0) {
-          continue;
+        // Step 6: Remove the current node from the open list and add it to the closed list
+        openList.remove(currentIndex);
+        closedList.add(currentNode);
+
+        // Step 7: Check if the current node is the goal
+        if (currentNode.equals(endNode)) {
+            // Step 8: Reconstruct the path from the end to the start
+            List<int[]> path = new ArrayList<>();
+            Node current = currentNode;
+            while (current != null) {
+                path.add(current.position);
+                current = current.parent;
+            }
+            Collections.reverse(path);
+            return path;
         }
 
-        Node newNode = new Node(currentNode, nodePosition);
-        children.add(newNode);
+        // Step 9: Generate children nodes in different directions
+        List<Node> children = new ArrayList<>();
+        int[][] directions = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-      }
+        for (int[] newPosition : directions) {
+            int[] nodePosition = {currentNode.position[0] + newPosition[0], currentNode.position[1] + newPosition[1]};
 
-      for (Node child : children) {
-        if (closedList.contains(child)) {
-          continue;
+            // Step 10: Check if the new position is within the maze boundaries
+            if (nodePosition[0] > maze.length - 1 || nodePosition[0] < 0 || nodePosition[1] > maze[0].length - 1 || nodePosition[1] < 0) {
+                continue;
+            }
+
+            // Step 11: Check if the new position is not an obstacle
+            if (maze[nodePosition[0]][nodePosition[1]] != 0) {
+                continue;
+            }
+
+            // Step 12: Create a new node for the valid position and add it to the children list
+            Node newNode = new Node(currentNode, nodePosition);
+            children.add(newNode);
         }
 
-        child.g = currentNode.g + 1;
-        child.h = (int) (Math.pow((child.position[0] - endNode.position[0]), 2) + Math.pow((child.position[1] - endNode.position[1]), 2));
-        child.f = child.g + child.h;
+        // Step 13: Process each child node
+        for (Node child : children) {
+            // Step 14: Skip if the child is already in the closed list
+            if (closedList.contains(child)) {
+                continue;
+            }
 
-        boolean shouldAdd = true;
-        for (Node openNode : openList) {
-          if (child.equals(openNode) && child.g > openNode.g) {
-            shouldAdd = false;
-            break;
-          }
-        }
+            // Step 15: Update the child's g, h, and f values
+            child.g = currentNode.g + 1;
+            child.h = (int) (Math.pow((child.position[0] - endNode.position[0]), 2) + Math.pow((child.position[1] - endNode.position[1]), 2));
+            child.f = child.g + child.h;
 
-        if (shouldAdd) {
-          openList.add(child);
+            // Step 16: Check if the child is already in the open list and has a lower g value
+            boolean shouldAdd = true;
+            for (Node openNode : openList) {
+                if (child.equals(openNode) && child.g > openNode.g) {
+                    shouldAdd = false;
+                    break;
+                }
+            }
+
+            // Step 17: Add the child to the open list if it meets the conditions
+            if (shouldAdd) {
+                openList.add(child);
+            }
         }
-      }
     }
 
-    return null; 
-  }
+    // Step 18: If the open list is empty and no path is found, return null
+    return null;
+}
+
 
   public static void main(String[] args) {
 
